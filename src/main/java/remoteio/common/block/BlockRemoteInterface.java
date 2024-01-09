@@ -15,6 +15,10 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import remoteio.common.RemoteIO;
 import remoteio.common.block.core.BlockIOCore;
 import remoteio.common.core.TransferType;
@@ -25,10 +29,6 @@ import remoteio.common.lib.DimensionalCoords;
 import remoteio.common.lib.VisualState;
 import remoteio.common.tile.TileRemoteInterface;
 import remoteio.common.tile.core.TileIOCore;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author dmillerw

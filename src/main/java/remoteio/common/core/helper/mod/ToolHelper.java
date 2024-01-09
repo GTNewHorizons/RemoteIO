@@ -4,10 +4,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-import remoteio.api.IIOTool;
-import remoteio.common.lib.DependencyInfo;
 import appeng.api.implementations.items.IAEWrench;
 import cpw.mods.fml.common.Loader;
+import remoteio.api.IIOTool;
+import remoteio.common.lib.DependencyInfo;
 
 /**
  * @author dmillerw

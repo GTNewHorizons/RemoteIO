@@ -4,9 +4,9 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-import remoteio.common.lib.ModItems;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import remoteio.common.lib.ModItems;
 
 /**
  * @author dmillerw

@@ -8,14 +8,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import remoteio.common.core.TransferType;
-import remoteio.common.tile.TileRemoteInterface;
+import com.google.common.collect.Lists;
+
 import appeng.api.AEApi;
-import appeng.api.networking.*;
+import appeng.api.networking.GridFlags;
+import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridBlock;
+import appeng.api.networking.IGridConnection;
+import appeng.api.networking.IGridHost;
+import appeng.api.networking.IGridNode;
+import appeng.api.networking.IGridVisitor;
 import appeng.api.util.IReadOnlyCollection;
 import appeng.util.ReadOnlyCollection;
-
-import com.google.common.collect.Lists;
+import remoteio.common.core.TransferType;
+import remoteio.common.tile.TileRemoteInterface;
 
 /**
  * @author dmillerw

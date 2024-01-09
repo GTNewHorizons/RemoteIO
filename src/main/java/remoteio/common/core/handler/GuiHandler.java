@@ -3,13 +3,24 @@ package remoteio.common.core.handler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
-import remoteio.client.gui.*;
+import cpw.mods.fml.common.network.IGuiHandler;
+import remoteio.client.gui.GuiDocumentation;
+import remoteio.client.gui.GuiIntelligentWorkbench;
+import remoteio.client.gui.GuiItemSetChannel;
+import remoteio.client.gui.GuiRFConfig;
+import remoteio.client.gui.GuiRemoteInterface;
+import remoteio.client.gui.GuiRemoteInventory;
+import remoteio.client.gui.GuiSimpleCamo;
+import remoteio.client.gui.GuiTileSetChannel;
 import remoteio.common.inventory.InventoryItem;
-import remoteio.common.inventory.container.*;
+import remoteio.common.inventory.container.ContainerIntelligentWorkbench;
+import remoteio.common.inventory.container.ContainerNull;
+import remoteio.common.inventory.container.ContainerRemoteInterface;
+import remoteio.common.inventory.container.ContainerRemoteInventory;
+import remoteio.common.inventory.container.ContainerSimpleCamo;
 import remoteio.common.tile.TileRemoteInterface;
 import remoteio.common.tile.TileRemoteInventory;
 import remoteio.common.tile.TileTransceiver;
-import cpw.mods.fml.common.network.IGuiHandler;
 
 /**
  * @author dmillerw

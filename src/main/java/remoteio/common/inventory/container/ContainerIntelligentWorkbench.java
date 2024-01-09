@@ -5,19 +5,24 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
+import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 
+import com.google.common.collect.Lists;
+
 import remoteio.common.inventory.InventoryTileCrafting;
 import remoteio.common.network.PacketHandler;
 import remoteio.common.network.packet.PacketClientForceSlot;
 import remoteio.common.tile.TileIntelligentWorkbench;
-
-import com.google.common.collect.Lists;
 
 /**
  * @author dmillerw

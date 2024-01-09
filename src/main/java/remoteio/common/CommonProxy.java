@@ -8,11 +8,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
-import remoteio.common.core.handler.ContainerHandler;
-import remoteio.common.network.ServerProxyPlayer;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import remoteio.common.core.handler.ContainerHandler;
+import remoteio.common.network.ServerProxyPlayer;
 
 /**
  * @author dmillerw

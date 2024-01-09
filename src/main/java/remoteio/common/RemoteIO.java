@@ -4,9 +4,27 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.ModMetadata;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
 import remoteio.common.block.BlockRemoteInterface;
 import remoteio.common.core.ChannelRegistry;
-import remoteio.common.core.handler.*;
+import remoteio.common.core.handler.BlockUpdateTicker;
+import remoteio.common.core.handler.ContainerHandler;
+import remoteio.common.core.handler.GuiHandler;
+import remoteio.common.core.handler.LocalizationUpdater;
+import remoteio.common.core.handler.PlayerEventHandler;
 import remoteio.common.core.helper.EventHelper;
 import remoteio.common.lib.ModBlocks;
 import remoteio.common.lib.ModInfo;
@@ -17,16 +35,6 @@ import remoteio.common.recipe.RecipeCopyLocation;
 import remoteio.common.recipe.RecipeInhibitorApply;
 import remoteio.common.recipe.RecipeRemoteInventory;
 import remoteio.common.tracker.BlockTracker;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.ModMetadata;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 @Mod(modid = ModInfo.ID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = ModInfo.DEPENDENCIES)
 public class RemoteIO {

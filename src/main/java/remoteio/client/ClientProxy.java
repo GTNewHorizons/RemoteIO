@@ -9,6 +9,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import remoteio.client.documentation.Documentation;
 import remoteio.client.handler.SoundHandler;
 import remoteio.client.handler.TooltipEventHandler;
@@ -28,11 +33,6 @@ import remoteio.common.tile.TileMachineReservoir;
 import remoteio.common.tile.TileRemoteInterface;
 import remoteio.common.tile.TileRemoteInventory;
 import remoteio.common.tile.TileTransceiver;
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 /**
  * @author dmillerw

@@ -13,13 +13,13 @@ import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLLog;
 import remoteio.client.helper.IORenderHelper;
 import remoteio.common.block.core.BlockIOCore;
 import remoteio.common.lib.DimensionalCoords;
 import remoteio.common.lib.VisualState;
 import remoteio.common.tile.TileRemoteInterface;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLLog;
 
 /**
  * @author dmillerw

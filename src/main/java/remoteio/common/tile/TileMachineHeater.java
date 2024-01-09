@@ -8,11 +8,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import cpw.mods.fml.common.Optional;
+import ic2.api.energy.tile.IHeatSource;
 import remoteio.common.RemoteIO;
 import remoteio.common.lib.DependencyInfo;
 import remoteio.common.tile.core.TileCore;
-import cpw.mods.fml.common.Optional;
-import ic2.api.energy.tile.IHeatSource;
 
 /**
  * @author dmillerw

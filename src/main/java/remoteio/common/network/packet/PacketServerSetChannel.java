@@ -3,13 +3,13 @@ package remoteio.common.network.packet;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 
-import remoteio.common.item.ItemWirelessLocationChip;
-import remoteio.common.lib.ModItems;
-import remoteio.common.tile.TileTransceiver;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
+import remoteio.common.item.ItemWirelessLocationChip;
+import remoteio.common.lib.ModItems;
+import remoteio.common.tile.TileTransceiver;
 
 /**
  * @author dmillerw

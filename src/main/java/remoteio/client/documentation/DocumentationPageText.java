@@ -4,9 +4,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.StatCollector;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import remoteio.client.gui.GuiDocumentation;
 import remoteio.common.lib.Strings;
-import cpw.mods.fml.client.FMLClientHandler;
 
 /**
  * @author dmillerw

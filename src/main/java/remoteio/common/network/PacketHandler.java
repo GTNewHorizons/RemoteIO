@@ -1,10 +1,14 @@
 package remoteio.common.network;
 
-import remoteio.common.lib.ModInfo;
-import remoteio.common.network.packet.*;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
+import remoteio.common.lib.ModInfo;
+import remoteio.common.network.packet.PacketClientAllowContainer;
+import remoteio.common.network.packet.PacketClientForceSlot;
+import remoteio.common.network.packet.PacketServerApplyRFConfig;
+import remoteio.common.network.packet.PacketServerOpenRemoteGUI;
+import remoteio.common.network.packet.PacketServerSetChannel;
 
 /**
  * @author dmillerw

@@ -1,6 +1,9 @@
 package remoteio.common.core;
 
-import static remoteio.common.lib.DependencyInfo.Paths.*;
+import static remoteio.common.lib.DependencyInfo.Paths.AE2;
+import static remoteio.common.lib.DependencyInfo.Paths.COFH;
+import static remoteio.common.lib.DependencyInfo.Paths.IC2;
+import static remoteio.common.lib.DependencyInfo.Paths.Thaumcraft;
 
 import java.util.Map;
 

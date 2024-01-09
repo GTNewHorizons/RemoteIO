@@ -4,12 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import remoteio.common.core.TransferType;
 import remoteio.common.lib.DimensionalCoords;
 import remoteio.common.tile.TileRemoteInterface;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 /**
  * @author dmillerw

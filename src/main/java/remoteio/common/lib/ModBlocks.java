@@ -2,11 +2,19 @@ package remoteio.common.lib;
 
 import net.minecraft.block.Block;
 
-import remoteio.common.block.*;
+import cpw.mods.fml.common.registry.GameRegistry;
+import remoteio.common.block.BlockIntelligentWorkbench;
+import remoteio.common.block.BlockMachine;
+import remoteio.common.block.BlockRemoteInterface;
+import remoteio.common.block.BlockRemoteInventory;
+import remoteio.common.block.BlockSkylight;
 import remoteio.common.block.item.ItemBlockRemoteInventory;
 import remoteio.common.item.block.ItemBlockMulti;
-import remoteio.common.tile.*;
-import cpw.mods.fml.common.registry.GameRegistry;
+import remoteio.common.tile.TileIntelligentWorkbench;
+import remoteio.common.tile.TileMachineHeater;
+import remoteio.common.tile.TileMachineReservoir;
+import remoteio.common.tile.TileRemoteInterface;
+import remoteio.common.tile.TileRemoteInventory;
 
 /**
  * @author dmillerw

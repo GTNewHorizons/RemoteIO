@@ -2,8 +2,16 @@ package remoteio.common.lib;
 
 import net.minecraft.item.Item;
 
-import remoteio.common.item.*;
 import cpw.mods.fml.common.registry.GameRegistry;
+import remoteio.common.item.ItemBlankPlate;
+import remoteio.common.item.ItemIOTool;
+import remoteio.common.item.ItemLinker;
+import remoteio.common.item.ItemLocationChip;
+import remoteio.common.item.ItemPDA;
+import remoteio.common.item.ItemRemoteAccessor;
+import remoteio.common.item.ItemTransferChip;
+import remoteio.common.item.ItemUpgradeChip;
+import remoteio.common.item.ItemWirelessTransmitter;
 
 /**
  * @author dmillerw
