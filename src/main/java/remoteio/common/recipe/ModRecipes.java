@@ -5,6 +5,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
+import appeng.api.AEApi;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.registry.GameRegistry;
+import ic2.api.item.IC2Items;
 import remoteio.common.core.TransferType;
 import remoteio.common.core.UpgradeType;
 import remoteio.common.core.helper.ModHelper;
@@ -12,11 +17,6 @@ import remoteio.common.core.helper.RecipeHelper;
 import remoteio.common.lib.DependencyInfo;
 import remoteio.common.lib.ModBlocks;
 import remoteio.common.lib.ModItems;
-import appeng.api.AEApi;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.GameRegistry;
-import ic2.api.item.IC2Items;
 
 /**
  * @author dmillerw

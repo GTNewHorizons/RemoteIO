@@ -4,12 +4,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-import remoteio.common.core.TransferType;
-import remoteio.common.lib.ModItems;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
+import remoteio.common.core.TransferType;
+import remoteio.common.lib.ModItems;
 
 /**
  * @author dmillerw

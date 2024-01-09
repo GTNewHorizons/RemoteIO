@@ -7,11 +7,11 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.ForgeHooksClient;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import remoteio.common.block.BlockRemoteInterface;
 import remoteio.common.block.core.BlockIOCore;
 import remoteio.common.lib.VisualState;
 import remoteio.common.tile.TileRemoteInterface;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 /**
  * @author dmillerw

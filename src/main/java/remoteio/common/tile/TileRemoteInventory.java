@@ -7,6 +7,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import cofh.api.energy.IEnergyHandler;
+import cpw.mods.fml.common.Optional;
+import ic2.api.energy.tile.IEnergySink;
+import ic2.api.energy.tile.IEnergySource;
 import remoteio.common.core.TransferType;
 import remoteio.common.core.UpgradeType;
 import remoteio.common.core.helper.PlayerHelper;
@@ -18,10 +22,6 @@ import remoteio.common.item.ItemWirelessTransmitter;
 import remoteio.common.lib.DependencyInfo;
 import remoteio.common.lib.VisualState;
 import remoteio.common.tile.core.TileIOCore;
-import cofh.api.energy.IEnergyHandler;
-import cpw.mods.fml.common.Optional;
-import ic2.api.energy.tile.IEnergySink;
-import ic2.api.energy.tile.IEnergySource;
 
 /**
  * @author dmillerw

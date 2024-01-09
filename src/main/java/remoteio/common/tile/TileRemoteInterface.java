@@ -17,23 +17,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-import remoteio.common.core.TransferType;
-import remoteio.common.core.UpgradeType;
-import remoteio.common.core.compat.LinkedGridNode;
-import remoteio.common.core.helper.RotationHelper;
-import remoteio.common.core.helper.mod.IC2Helper;
-import remoteio.common.lib.DependencyInfo;
-import remoteio.common.lib.DimensionalCoords;
-import remoteio.common.lib.ModItems;
-import remoteio.common.lib.VisualState;
-import remoteio.common.tile.core.TileIOCore;
-import remoteio.common.tracker.BlockTracker;
-import remoteio.common.tracker.RedstoneTracker;
-import thaumcraft.api.aspects.Aspect;
-import thaumcraft.api.aspects.AspectList;
-import thaumcraft.api.aspects.IAspectSource;
-import thaumcraft.api.aspects.IEssentiaTransport;
-import thaumcraft.api.wands.IWandable;
 import appeng.api.networking.GridFlags;
 import appeng.api.networking.GridNotification;
 import appeng.api.networking.IGrid;
@@ -52,6 +35,23 @@ import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergySource;
 import ic2.api.tile.IEnergyStorage;
 import ic2.api.tile.IWrenchable;
+import remoteio.common.core.TransferType;
+import remoteio.common.core.UpgradeType;
+import remoteio.common.core.compat.LinkedGridNode;
+import remoteio.common.core.helper.RotationHelper;
+import remoteio.common.core.helper.mod.IC2Helper;
+import remoteio.common.lib.DependencyInfo;
+import remoteio.common.lib.DimensionalCoords;
+import remoteio.common.lib.ModItems;
+import remoteio.common.lib.VisualState;
+import remoteio.common.tile.core.TileIOCore;
+import remoteio.common.tracker.BlockTracker;
+import remoteio.common.tracker.RedstoneTracker;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.aspects.IAspectSource;
+import thaumcraft.api.aspects.IEssentiaTransport;
+import thaumcraft.api.wands.IWandable;
 
 /**
  * @author dmillerw

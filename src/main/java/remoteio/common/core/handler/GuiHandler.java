@@ -3,13 +3,13 @@ package remoteio.common.core.handler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.network.IGuiHandler;
 import remoteio.client.gui.*;
 import remoteio.common.inventory.InventoryItem;
 import remoteio.common.inventory.container.*;
 import remoteio.common.tile.TileRemoteInterface;
 import remoteio.common.tile.TileRemoteInventory;
 import remoteio.common.tile.TileTransceiver;
-import cpw.mods.fml.common.network.IGuiHandler;
 
 /**
  * @author dmillerw

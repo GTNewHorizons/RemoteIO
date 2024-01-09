@@ -7,10 +7,10 @@ import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.world.IBlockAccess;
 
-import remoteio.common.lib.DimensionalCoords;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
+import remoteio.common.lib.DimensionalCoords;
 
 /**
  * @author dmillerw

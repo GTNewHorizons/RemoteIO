@@ -12,12 +12,12 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 
+import com.google.common.collect.Lists;
+
 import remoteio.common.inventory.InventoryTileCrafting;
 import remoteio.common.network.PacketHandler;
 import remoteio.common.network.packet.PacketClientForceSlot;
 import remoteio.common.tile.TileIntelligentWorkbench;
-
-import com.google.common.collect.Lists;
 
 /**
  * @author dmillerw

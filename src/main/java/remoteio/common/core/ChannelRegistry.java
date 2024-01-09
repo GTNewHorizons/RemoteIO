@@ -13,11 +13,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.WorldEvent;
 
-import remoteio.common.lib.DimensionalCoords;
-
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import remoteio.common.lib.DimensionalCoords;
 
 /**
  * @author dmillerw

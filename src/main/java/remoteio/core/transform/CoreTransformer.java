@@ -5,9 +5,9 @@ import java.util.List;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
-import remoteio.core.MappingHelper;
-
 import com.google.common.collect.Lists;
+
+import remoteio.core.MappingHelper;
 
 /**
  * @author dmillerw

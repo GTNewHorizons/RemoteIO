@@ -2,11 +2,11 @@ package remoteio.common.lib;
 
 import net.minecraft.block.Block;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import remoteio.common.block.*;
 import remoteio.common.block.item.ItemBlockRemoteInventory;
 import remoteio.common.item.block.ItemBlockMulti;
 import remoteio.common.tile.*;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 /**
  * @author dmillerw
