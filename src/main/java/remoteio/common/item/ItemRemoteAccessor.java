@@ -56,7 +56,7 @@ public final class ItemRemoteAccessor extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean debug) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean debug) {
         DimensionalCoords coords = ItemRemoteAccessor.getCoordinates(stack);
         if (!player.isSneaking()) {
             if (coords != null) {

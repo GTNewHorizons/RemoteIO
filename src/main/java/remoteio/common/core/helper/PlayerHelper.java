@@ -14,7 +14,7 @@ public class PlayerHelper {
     public static EntityPlayerMP getPlayerForUsername(String username) {
         ServerConfigurationManager serverConfigurationManager = MinecraftServer.getServer().getConfigurationManager();
 
-        Iterator iterator = serverConfigurationManager.playerEntityList.iterator();
+        Iterator<EntityPlayerMP> iterator = serverConfigurationManager.playerEntityList.iterator();
         EntityPlayerMP entityplayermp;
 
         do {
@@ -22,7 +22,7 @@ public class PlayerHelper {
                 return null;
             }
 
-            entityplayermp = (EntityPlayerMP) iterator.next();
+            entityplayermp = iterator.next();
         } while (!entityplayermp.getCommandSenderName().equalsIgnoreCase(username));
 
         return entityplayermp;

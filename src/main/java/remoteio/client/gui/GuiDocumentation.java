@@ -46,9 +46,6 @@ public class GuiDocumentation extends GuiScreen {
     private List<DocumentationEntry> categoryCache = null;
     private DocumentationEntry currentEntry = null;
     private IDocumentationPage currentPage = null;
-    private int currentPageIndex = 0;
-
-    private List<IDocumentationPage> entryCache;
 
     private int guiLeft;
     private int guiTop;

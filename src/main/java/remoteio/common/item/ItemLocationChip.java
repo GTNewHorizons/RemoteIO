@@ -29,7 +29,7 @@ public final class ItemLocationChip extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean debug) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean debug) {
         DimensionalCoords coords = ItemLocationChip.getCoordinates(stack);
         if (coords != null) {
             list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());

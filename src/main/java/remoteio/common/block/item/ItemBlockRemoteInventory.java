@@ -18,7 +18,7 @@ public class ItemBlockRemoteInventory extends ItemBlock {
     }
 
     @Override
-    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean debug) {
+    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List<String> list, boolean debug) {
         if (itemStack.hasTagCompound() && itemStack.getTagCompound().hasKey("targetPlayer")) {
             list.add(
                     String.format(

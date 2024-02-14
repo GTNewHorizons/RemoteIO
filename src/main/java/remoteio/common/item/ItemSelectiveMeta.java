@@ -36,7 +36,7 @@ public class ItemSelectiveMeta extends Item {
     }
 
     @Override
-    public void getSubItems(Item item, CreativeTabs tab, List list) {
+    public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> list) {
         for (int i : values) {
             list.add(new ItemStack(this, 1, i));
         }

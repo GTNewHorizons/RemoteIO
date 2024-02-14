@@ -24,14 +24,6 @@ public class InventoryItem implements IInventory {
         readFromNBT();
     }
 
-    private InventoryItem(ItemStack stack, int slotCount, int stackSize) {
-        this.stack = stack;
-        this.inv = new ItemStack[slotCount];
-        this.stackSize = stackSize;
-
-        readFromNBT();
-    }
-
     public ItemStack getStack() {
         return stack.copy();
     }
