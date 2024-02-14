@@ -3,7 +3,6 @@ package remoteio.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -28,8 +27,6 @@ public class GuiRemoteInterface extends GuiContainer {
 
     private final TileRemoteInterface tile;
 
-    private RenderBlocks renderBlocks;
-
     private Matrix4f initialMatrix;
 
     public GuiRemoteInterface(InventoryPlayer inventoryPlayer, TileRemoteInterface tile) {
@@ -39,7 +36,6 @@ public class GuiRemoteInterface extends GuiContainer {
         this.ySize = 243;
 
         this.tile = tile;
-        this.renderBlocks = new RenderBlocks(tile.getWorldObj());
         this.initialMatrix = MatrixHelper.getRotationMatrix(Minecraft.getMinecraft().renderViewEntity);
     }
 

@@ -9,8 +9,6 @@ import net.minecraft.entity.Entity;
  */
 public class ClientProxyPlayer extends EntityClientPlayerMP {
 
-    private EntityClientPlayerMP parentPlayer;
-
     public ClientProxyPlayer(EntityClientPlayerMP parentPlayer) {
         super(
                 Minecraft.getMinecraft(),

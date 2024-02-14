@@ -3,13 +3,11 @@ package remoteio.client.render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 
@@ -18,19 +16,12 @@ import cpw.mods.fml.common.FMLLog;
 import remoteio.client.helper.IORenderHelper;
 import remoteio.common.block.core.BlockIOCore;
 import remoteio.common.lib.DimensionalCoords;
-import remoteio.common.lib.VisualState;
 import remoteio.common.tile.TileRemoteInterface;
 
 /**
  * @author dmillerw
  */
 public class RenderTileRemoteInterface extends TileEntitySpecialRenderer {
-
-    private RenderBlocks renderBlocks;
-
-    private static boolean shouldRender(VisualState visualState) {
-        return visualState == VisualState.CAMOUFLAGE_REMOTE || visualState == VisualState.CAMOUFLAGE_BOTH;
-    }
 
     public void renderRemoteInterfaceAt(TileRemoteInterface tile, double x, double y, double z, float partial) {
         if (tile.remotePosition != null && tile.remotePosition.inWorld(tile.getWorldObj())
@@ -94,10 +85,5 @@ public class RenderTileRemoteInterface extends TileEntitySpecialRenderer {
     @Override
     public void renderTileEntityAt(TileEntity var1, double var2, double var4, double var6, float var8) {
         renderRemoteInterfaceAt((TileRemoteInterface) var1, var2, var4, var6, var8);
-    }
-
-    @Override
-    public void func_147496_a(World world) {
-        renderBlocks = new RenderBlocks(world);
     }
 }

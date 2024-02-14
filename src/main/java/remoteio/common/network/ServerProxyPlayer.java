@@ -9,15 +9,12 @@ import net.minecraft.world.WorldServer;
  */
 public class ServerProxyPlayer extends EntityPlayerMP {
 
-    private EntityPlayerMP parentPlayer;
-
     public ServerProxyPlayer(EntityPlayerMP parentPlayer) {
         super(
                 parentPlayer.mcServer,
                 (WorldServer) parentPlayer.worldObj,
                 parentPlayer.getGameProfile(),
                 parentPlayer.theItemInWorldManager);
-        this.parentPlayer = parentPlayer;
     }
 
     @Override

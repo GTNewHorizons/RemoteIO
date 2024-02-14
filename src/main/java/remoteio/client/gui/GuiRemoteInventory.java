@@ -19,15 +19,11 @@ public class GuiRemoteInventory extends GuiContainer {
     public static final ResourceLocation TEXTURE = new ResourceLocation(
             ModInfo.RESOURCE_PREFIX + "textures/gui/upgrade.png");
 
-    private final TileRemoteInventory tile;
-
     public GuiRemoteInventory(InventoryPlayer inventoryPlayer, TileRemoteInventory tile) {
         super(new ContainerRemoteInventory(inventoryPlayer, tile));
 
         this.xSize = 196;
         this.ySize = 243;
-
-        this.tile = tile;
     }
 
     @Override
