@@ -53,6 +53,8 @@ public class RenderTileTransceiver extends TileEntitySpecialRenderer {
                 GL11.glTranslated(0.5, -0.5, 0);
                 break;
             }
+            default:
+                break;
         }
 
         GL11.glDisable(GL11.GL_TEXTURE_2D);

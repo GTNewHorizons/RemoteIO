@@ -1,5 +1,6 @@
 package remoteio.common.recipe;
 
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -243,9 +244,9 @@ public class ModRecipes {
 
         // TRANSFER TYPE - AE2 NETWORK
         if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
-            Object component = AEApi.instance().blocks().blockController.block();
+            Block component = AEApi.instance().definitions().blocks().controller().maybeBlock().orNull();
             if (component == null) {
-                component = AEApi.instance().blocks().blockChest.block();
+                component = AEApi.instance().definitions().blocks().chest().maybeBlock().orNull();
             }
 
             if (component != null) {
