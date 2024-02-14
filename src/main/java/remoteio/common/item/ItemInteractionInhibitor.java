@@ -29,7 +29,7 @@ public class ItemInteractionInhibitor extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean debug) {
+    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List<String> list, boolean debug) {
         // Status
         switch (itemStack.getItemDamage()) {
             case 0:
@@ -72,7 +72,7 @@ public class ItemInteractionInhibitor extends Item {
     }
 
     @Override
-    public void getSubItems(Item item, CreativeTabs creativeTab, List list) {
+    public void getSubItems(Item item, CreativeTabs creativeTab, List<ItemStack> list) {
         list.add(new ItemStack(this, 1, 0));
         list.add(new ItemStack(this, 1, 2));
     }

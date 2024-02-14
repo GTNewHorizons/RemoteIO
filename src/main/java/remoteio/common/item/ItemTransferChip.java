@@ -37,7 +37,7 @@ public class ItemTransferChip extends ItemSelectiveMeta {
     }
 
     @Override
-    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean debug) {
+    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List<String> list, boolean debug) {
         if (itemStack.getItemDamage() == TransferType.ENERGY_RF) {
             if (itemStack.hasTagCompound()) {
                 list.add("Push Power: " + itemStack.getTagCompound().getBoolean("pushPower"));

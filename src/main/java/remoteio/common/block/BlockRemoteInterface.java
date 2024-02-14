@@ -95,6 +95,7 @@ public class BlockRemoteInterface extends BlockIOCore {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         TileRemoteInterface tile = (TileRemoteInterface) world.getTileEntity(x, y, z);
@@ -275,7 +276,7 @@ public class BlockRemoteInterface extends BlockIOCore {
     }
 
     @Override
-    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB aabb, List list,
+    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB aabb, List<AxisAlignedBB> list,
             Entity entity) {
         TileRemoteInterface tile = (TileRemoteInterface) world.getTileEntity(x, y, z);
 
@@ -290,7 +291,7 @@ public class BlockRemoteInterface extends BlockIOCore {
             AxisAlignedBB newAABB = AxisAlignedBB
                     .getBoundingBox(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ)
                     .offset(offsetX, offsetY, offsetZ);
-            List newList = new ArrayList();
+            List<AxisAlignedBB> newList = new ArrayList<>();
 
             remote.addCollisionBoxesToList(world, there.x, there.y, there.z, newAABB, newList, entity);
 

@@ -434,11 +434,11 @@ public class TileRemoteInterface extends TileIOCore
 
     /* END CLIENT UPDATE METHODS */
 
-    public Object getUpgradeImplementation(Class cls) {
+    public Object getUpgradeImplementation(Class<?> cls) {
         return getUpgradeImplementation(cls, -1);
     }
 
-    public Object getUpgradeImplementation(Class cls, int upgradeType) {
+    public Object getUpgradeImplementation(Class<?> cls, int upgradeType) {
         if (remotePosition == null) {
             return null;
         }
@@ -468,11 +468,11 @@ public class TileRemoteInterface extends TileIOCore
         return cls.cast(remote);
     }
 
-    public Object getTransferImplementation(Class cls) {
+    public Object getTransferImplementation(Class<?> cls) {
         return getTransferImplementation(cls, true);
     }
 
-    public Object getTransferImplementation(Class cls, boolean requiresChip) {
+    public Object getTransferImplementation(Class<?> cls, boolean requiresChip) {
         if (remotePosition == null) {
             return null;
         }

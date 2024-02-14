@@ -54,7 +54,7 @@ public class TransferType {
         registerType(NETWORK_AE, AE2.IGRIDHOST, AE2.IGRIDBLOCK);
     }
 
-    public static void registerType(int type, Class... classes) {
+    public static void registerType(int type, Class<?>... classes) {
         String[] names = new String[classes.length];
         for (int i = 0; i < classes.length; i++) {
             names[i] = classes[i].getName();
@@ -66,7 +66,7 @@ public class TransferType {
         typeToInterfaceMap.put(type, classes);
     }
 
-    public static int getTypeForInterface(Class cls) {
+    public static int getTypeForInterface(Class<?> cls) {
         for (Map.Entry<String[], Integer> entry : typeToInterfaceMap.inverse().entrySet()) {
             for (String clz : entry.getKey()) {
                 if (cls.getName().equals(clz)) {
