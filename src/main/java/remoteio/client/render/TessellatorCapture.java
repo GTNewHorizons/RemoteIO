@@ -49,7 +49,7 @@ public class TessellatorCapture {
         return rotatePointWithOffset(x, y, z, offsetX, 0, offsetZ);
     }
 
-    private static ThreadLocal<double[]> rotationPointOffset = ThreadLocal.withInitial(() -> new double[3]);
+    private static final ThreadLocal<double[]> rotationPointOffset = ThreadLocal.withInitial(() -> new double[3]);
 
     public static double[] rotatePointWithOffset(double x, double y, double z, double offsetX, double offsetY,
             double offsetZ) {
