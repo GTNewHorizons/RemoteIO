@@ -25,6 +25,7 @@ public class TessellatorCapture {
     }
 
     private static ThreadLocal<double[]> rotationPoint = ThreadLocal.withInitial(() -> new double[3]);
+
     public static double[] rotatePoint(double x, double y, double z) {
         if (capture) {
             final double radians = Math.toRadians(rotationAngle);
@@ -49,6 +50,7 @@ public class TessellatorCapture {
     }
 
     private static ThreadLocal<double[]> rotationPointOffset = ThreadLocal.withInitial(() -> new double[3]);
+
     public static double[] rotatePointWithOffset(double x, double y, double z, double offsetX, double offsetY,
             double offsetZ) {
         if (capture) {
