@@ -76,8 +76,10 @@ public final class ItemRemoteAccessor extends Item {
             float fy, float fz) {
         if (getCoordinates(stack) != null) {
             DimensionalCoords coords = getCoordinates(stack);
-            RemoteIO.proxy.activateBlock(world, coords.x, coords.y, coords.z, player, side, fx, fy, fz);
-            return true;
+            if (coords.dimensionID == world.provider.dimensionId) {
+                RemoteIO.proxy.activateBlock(world, coords.x, coords.y, coords.z, player, side, fx, fy, fz);
+                return true;
+            }
         }
 
         return false;
