@@ -49,7 +49,6 @@ public class RenderBlockRemoteInterface implements ISimpleBlockRenderingHandler 
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
             RenderBlocks renderer) {
         TileRemoteInterface tile = (TileRemoteInterface) world.getTileEntity(x, y, z);
-
         if (tile != null) {
             if (tile.remotePosition == null || !tile.remotePosition.inWorld(tile.getWorldObj())
                     || tile.visualState != VisualState.CAMOUFLAGE_REMOTE) {
@@ -57,31 +56,11 @@ public class RenderBlockRemoteInterface implements ISimpleBlockRenderingHandler 
             } else {
                 if (tile.remotePosition != null && tile.remotePosition.inWorld(tile.getWorldObj())) {
                     Block remoteBlock = tile.remotePosition.getBlock();
-                    int rx = tile.remotePosition.x - x;
-                    int ry = tile.remotePosition.y - y;
-                    int rz = tile.remotePosition.z - z;
-
-                    Tessellator tessellator = Tessellator.instance;
-
                     if (remoteBlock.getRenderType() == 0) {
                         renderer.renderStandardBlock(block, x, y, z);
                     } else {
                         if (remoteBlock.canRenderInPass(ForgeHooksClient.getWorldRenderPass())) {
-                            TessellatorCapture.startCapturing();
-
-                            TessellatorCapture.rotationAngle = 90 * tile.rotationY;
-                            TessellatorCapture.offsetX = -(x + rx) - 1;
-                            TessellatorCapture.offsetZ = -(z + rz) - 1;
-
-                            tessellator.addTranslation(-rx, -ry, -rz);
-                            renderer.renderBlockByRenderType(
-                                    remoteBlock,
-                                    tile.remotePosition.x,
-                                    tile.remotePosition.y,
-                                    tile.remotePosition.z);
-                            tessellator.addTranslation(rx, ry, rz);
-
-                            TessellatorCapture.reset();
+                            renderer.renderBlockByRenderType(remoteBlock, x, y, z);
                         }
                     }
                 }
