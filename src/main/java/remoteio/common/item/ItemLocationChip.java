@@ -32,7 +32,10 @@ public final class ItemLocationChip extends Item {
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean debug) {
         DimensionalCoords coords = ItemLocationChip.getCoordinates(stack);
         if (coords != null) {
-            list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());
+            if(DimensionManager.getWorld(coords.dimensionID) != null)
+                list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());
+            else
+                list.add("Dimension: " + coords.dimensionID);
             list.add("X: " + coords.x + " Y: " + coords.y + " Z: " + coords.z);
         }
     }
