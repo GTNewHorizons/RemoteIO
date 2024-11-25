@@ -1067,7 +1067,7 @@ public class TileRemoteInterface extends TileIOCore
     @Optional.Method(modid = DependencyInfo.ModIds.AE2)
     public EnumSet<GridFlags> getFlags() {
         IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        return gridBlock != null ? getFlags() : EnumSet.noneOf(GridFlags.class);
+        return gridBlock != null ? gridBlock.getFlags() : EnumSet.noneOf(GridFlags.class);
     }
 
     @Override
@@ -1127,7 +1127,7 @@ public class TileRemoteInterface extends TileIOCore
     @Optional.Method(modid = DependencyInfo.ModIds.AE2)
     public ItemStack getMachineRepresentation() {
         IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        return gridBlock != null ? getMachineRepresentation() : new ItemStack(this.blockType);
+        return gridBlock != null ? gridBlock.getMachineRepresentation() : new ItemStack(this.blockType);
     }
 
     /* END IMPLEMENTATIONS */
