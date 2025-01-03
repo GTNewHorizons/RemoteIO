@@ -15,6 +15,8 @@ import net.minecraftforge.common.DimensionManager;
 
 import org.lwjgl.input.Keyboard;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import remoteio.common.RemoteIO;
 import remoteio.common.core.TabRemoteIO;
 import remoteio.common.lib.DimensionalCoords;
@@ -57,6 +59,7 @@ public final class ItemRemoteAccessor extends Item {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean debug) {
         DimensionalCoords coords = ItemRemoteAccessor.getCoordinates(stack);
