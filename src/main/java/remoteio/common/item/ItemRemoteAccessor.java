@@ -60,13 +60,18 @@ public final class ItemRemoteAccessor extends Item {
         DimensionalCoords coords = ItemRemoteAccessor.getCoordinates(stack);
         if (!player.isSneaking()) {
             if (coords != null) {
-                list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());
+                if (DimensionManager.getWorld(coords.dimensionID) != null)
+                    list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());
+                else list.add("Dimension: " + coords.dimensionID);
                 list.add("X: " + coords.x + " Y: " + coords.y + " Z: " + coords.z);
             }
         } else {
             if (coords != null) {
-                list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());
-                list.add("Block: " + player.worldObj.getBlock(coords.x, coords.y, coords.z).getLocalizedName());
+                if (DimensionManager.getWorld(coords.dimensionID) != null)
+                    list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());
+                else list.add("Dimension: " + coords.dimensionID);
+                if(player.worldObj.provider.dimensionId == coords.dimensionID)
+                    list.add("Block: " + player.worldObj.getBlock(coords.x, coords.y, coords.z).getLocalizedName());
             }
         }
     }
