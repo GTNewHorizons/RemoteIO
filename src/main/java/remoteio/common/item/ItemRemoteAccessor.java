@@ -70,7 +70,7 @@ public final class ItemRemoteAccessor extends Item {
                 if (DimensionManager.getWorld(coords.dimensionID) != null)
                     list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());
                 else list.add("Dimension: " + coords.dimensionID);
-                if(player.worldObj.provider.dimensionId == coords.dimensionID)
+                if (player.worldObj.provider.dimensionId == coords.dimensionID)
                     list.add("Block: " + player.worldObj.getBlock(coords.x, coords.y, coords.z).getLocalizedName());
             }
         }
