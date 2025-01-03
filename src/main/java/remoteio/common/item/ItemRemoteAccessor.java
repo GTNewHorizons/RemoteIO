@@ -13,6 +13,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
+import org.lwjgl.input.Keyboard;
+
 import remoteio.common.RemoteIO;
 import remoteio.common.core.TabRemoteIO;
 import remoteio.common.lib.DimensionalCoords;
@@ -58,7 +60,8 @@ public final class ItemRemoteAccessor extends Item {
     @Override
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> list, boolean debug) {
         DimensionalCoords coords = ItemRemoteAccessor.getCoordinates(stack);
-        if (!player.isSneaking()) {
+        final boolean isShiftHeld = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+        if (!isShiftHeld) {
             if (coords != null) {
                 if (DimensionManager.getWorld(coords.dimensionID) != null)
                     list.add("Dimension: " + DimensionManager.getProvider(coords.dimensionID).getDimensionName());
