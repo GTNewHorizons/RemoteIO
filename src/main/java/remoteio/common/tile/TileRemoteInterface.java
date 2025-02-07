@@ -344,29 +344,15 @@ public class TileRemoteInterface extends TileIOCore
      */
     public void setRemotePosition(DimensionalCoords coords) {
         IC2Helper.unloadEnergyTile(this);
-        /*
-         * if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) { if (aeGridNode != null) { aeGridNode.destroy();
-         * aeGridNode.updateState(); } }
-         */
         RedstoneTracker.unregister(this);
         BlockTracker.INSTANCE.stopTracking(remotePosition);
         remotePosition = coords;
         RedstoneTracker.register(this);
         BlockTracker.INSTANCE.startTracking(remotePosition, this);
-
         IC2Helper.loadEnergyTile(this);
-        /*
-         * if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) { if (remotePosition != null &&
-         * remotePosition.getTileEntity() != this && hasTransferChip(TransferType.NETWORK_AE)) { if
-         * (remotePosition.getTileEntity() instanceof IGridHost) { aeGridNode = new LinkedGridNode( ((IGridHost)
-         * remotePosition.getTileEntity()).getGridNode(ForgeDirection.UNKNOWN), this); aeGridNode.updateState(); } } for
-         * (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) { TileEntity tileEntity =
-         * worldObj.getTileEntity( xCoord + forgeDirection.offsetX, yCoord + forgeDirection.offsetY, zCoord +
-         * forgeDirection.offsetZ); if (tileEntity != null && tileEntity instanceof IGridHost) { IGridNode gridNode =
-         * ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite()); if (gridNode != null)
-         * gridNode.updateState(); } } }
-         */
         worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.getBlockType());
+        disconnectAE();
+        connectAE();
         markForUpdate();
     }
 
