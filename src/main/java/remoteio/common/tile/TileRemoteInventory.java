@@ -107,6 +107,7 @@ public class TileRemoteInventory extends TileIOCore implements IInventory, IEner
     @Override
     public void invalidate() {
         IC2Helper.unloadEnergyTile(this);
+        super.invalidate();
     }
 
     /* CHIP METHODS */

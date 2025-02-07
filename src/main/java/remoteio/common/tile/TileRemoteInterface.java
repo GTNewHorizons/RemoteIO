@@ -304,6 +304,7 @@ public class TileRemoteInterface extends TileIOCore
 
         RedstoneTracker.unregister(this);
         BlockTracker.INSTANCE.stopTracking(remotePosition);
+        super.invalidate();
     }
 
     @Override
@@ -418,7 +419,7 @@ public class TileRemoteInterface extends TileIOCore
 
             for (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) {
                 TileEntity tileEntity = worldObj.getTileEntity(
-                        xCoord + forgeDirection.offsetZ,
+                        xCoord + forgeDirection.offsetX,
                         yCoord + forgeDirection.offsetY,
                         zCoord + forgeDirection.offsetZ);
                 if (tileEntity != null && tileEntity instanceof IGridHost) {
