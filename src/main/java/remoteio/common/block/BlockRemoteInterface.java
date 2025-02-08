@@ -82,6 +82,9 @@ public class BlockRemoteInterface extends BlockIOCore {
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
         TileRemoteInterface tile = (TileRemoteInterface) world.getTileEntity(x, y, z);
+        if (tile != null && !world.isRemote) {
+            tile.updateAEConnection();
+        }
         if (tile != null && tile.remotePosition != null && tile.hasTransferChip(TransferType.REDSTONE)) {
             tile.remotePosition.getBlock().onNeighborBlockChange(
                     tile.remotePosition.getWorld(),
