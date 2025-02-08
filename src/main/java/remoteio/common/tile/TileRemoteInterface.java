@@ -1,5 +1,8 @@
 package remoteio.common.tile;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -178,10 +181,9 @@ public class TileRemoteInterface extends TileIOCore
     @Override
     public void updateEntity() {
         if (!worldObj.isRemote) {
-            if (AEUpdateCooldown-- <= 0) {
+            if (AEUpdateCooldown-- <= 0 || justDestroyed) {
+                justDestroyed = false;
                 AEUpdateCooldown = 20;
-                // there's no way to check if the remote AE network is changed...
-                // so update the connections every 20 ticks
                 updateAEConnection();
             }
             if (!trackingRedstone) {
@@ -351,8 +353,10 @@ public class TileRemoteInterface extends TileIOCore
         BlockTracker.INSTANCE.startTracking(remotePosition, this);
         IC2Helper.loadEnergyTile(this);
         worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.getBlockType());
-        disconnectAE();
-        connectAE();
+        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
+            disconnectAE();
+            connectAE();
+        }
         markForUpdate();
     }
 
@@ -969,8 +973,8 @@ public class TileRemoteInterface extends TileIOCore
     private boolean connected;
 
     public void updateAEConnection() {
-        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) if (hasTransferChip(TransferType.NETWORK_AE)) {
-            // new neighbour nodes might be added when connected
+        if (!Loader.isModLoaded(DependencyInfo.ModIds.AE2)) return;
+        if (hasTransferChip(TransferType.NETWORK_AE)) {
             // if (!connected)
             connectAE();
         } else {
@@ -989,23 +993,30 @@ public class TileRemoteInterface extends TileIOCore
             if (tileEntity != null && tileEntity instanceof IGridHost) {
                 IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
                 if (gridNode != null) {
-
+                    ArrayList<IGridConnection> toDestroy = new ArrayList<>();
                     for (IGridConnection connect : gridNode.getConnections()) {
                         if (connect instanceof RIOGridConnection
                                 && connect.getDirection(gridNode) == forgeDirection.getOpposite()) {
-                            connect.destroy();
+                            toDestroy.add(connect);
                         }
 
                     } ;
+                    toDestroy.forEach(connect -> connect.destroy());
                 }
             }
         }
     }
 
+    private EnumMap<ForgeDirection, RIOGridConnection> connections = new EnumMap<>(ForgeDirection.class);
+
     @Optional.Method(modid = DependencyInfo.ModIds.AE2)
     public void connectAE() {
         connected = true;
+        connections.entrySet().removeIf(e -> e.getValue().isDestroyed());
         for (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) {
+            if (connections.containsKey(forgeDirection)) {
+                continue;
+            }
             TileEntity tileEntity = getWorldObj().getTileEntity(
                     xCoord + forgeDirection.offsetX,
                     yCoord + forgeDirection.offsetY,
@@ -1014,8 +1025,12 @@ public class TileRemoteInterface extends TileIOCore
                 IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
                 if (gridNode != null) {
                     try {
-                        if (getGridNode(forgeDirection) != null)
-                            new RIOGridConnection(gridNode, getGridNode(forgeDirection), forgeDirection.getOpposite());
+                        if (getGridNode(forgeDirection) != null) connections.put(
+                                forgeDirection,
+                                new RIOGridConnection(
+                                        gridNode,
+                                        getGridNode(forgeDirection),
+                                        forgeDirection.getOpposite()));
                     } catch (FailedConnection e) {
                         // already connected or permission denied
                     }
@@ -1026,11 +1041,26 @@ public class TileRemoteInterface extends TileIOCore
 
     }
 
-    public static class RIOGridConnection extends GridConnection {
+    private boolean justDestroyed;
+
+    public class RIOGridConnection extends GridConnection {
 
         public RIOGridConnection(IGridNode aNode, IGridNode bNode, ForgeDirection fromAtoB) throws FailedConnection {
             super(aNode, bNode, fromAtoB);
 
+        }
+
+        private boolean destroyed;
+
+        @Override
+        public void destroy() {
+            destroyed = true;
+            justDestroyed = true;
+            super.destroy();
+        }
+
+        public boolean isDestroyed() {
+            return destroyed;
         }
     }
     /* END IMPLEMENTATIONS */
