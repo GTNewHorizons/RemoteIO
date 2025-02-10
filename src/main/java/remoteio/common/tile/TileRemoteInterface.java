@@ -1,6 +1,7 @@
 package remoteio.common.tile;
 
-import java.util.EnumSet;
+import java.util.ArrayList;
+import java.util.EnumMap;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -17,15 +18,11 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-import appeng.api.networking.GridFlags;
-import appeng.api.networking.GridNotification;
-import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridBlock;
+import appeng.api.exceptions.FailedConnection;
+import appeng.api.networking.IGridConnection;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
-import appeng.api.util.AECableType;
-import appeng.api.util.AEColor;
-import appeng.api.util.DimensionalCoord;
+import appeng.me.GridConnection;
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModAPIManager;
@@ -37,7 +34,6 @@ import ic2.api.tile.IEnergyStorage;
 import ic2.api.tile.IWrenchable;
 import remoteio.common.core.TransferType;
 import remoteio.common.core.UpgradeType;
-import remoteio.common.core.compat.LinkedGridNode;
 import remoteio.common.core.helper.RotationHelper;
 import remoteio.common.core.helper.mod.IC2Helper;
 import remoteio.common.lib.DependencyInfo;
@@ -73,8 +69,7 @@ import thaumcraft.api.wands.IWandable;
         @Optional.Interface(iface = DependencyInfo.Paths.IC2.IENERGYTILE, modid = DependencyInfo.ModIds.IC2),
         @Optional.Interface(iface = DependencyInfo.Paths.IC2.IENERGYSTORAGE, modid = DependencyInfo.ModIds.IC2),
         @Optional.Interface(iface = DependencyInfo.Paths.COFH.IENERGYHANDLER, modid = DependencyInfo.ModIds.COFH_API),
-        @Optional.Interface(iface = DependencyInfo.Paths.AE2.IGRIDHOST, modid = DependencyInfo.ModIds.AE2),
-        @Optional.Interface(iface = DependencyInfo.Paths.AE2.IGRIDBLOCK, modid = DependencyInfo.ModIds.AE2),
+
         @Optional.Interface(
                 iface = DependencyInfo.Paths.Thaumcraft.IWANDABLE,
                 modid = DependencyInfo.ModIds.THAUMCRAFT),
@@ -86,8 +81,6 @@ public class TileRemoteInterface extends TileIOCore
         IEnergySink, // IC2
         IEnergyStorage, // IC2
         IEnergyHandler, // COFH
-        IGridHost, // AE2
-        IGridBlock, // AE2
         IWandable, // THAUMCRAFT
         IWrenchable // IC2
 {
@@ -131,8 +124,6 @@ public class TileRemoteInterface extends TileIOCore
     }
 
     public DimensionalCoords remotePosition;
-
-    private LinkedGridNode aeGridNode;
 
     // THIS IS NOT AN ANGLE, BUT THE NUMBER OF LEFT-HAND ROTATIONS!
     public int rotationY = 0;
@@ -185,37 +176,16 @@ public class TileRemoteInterface extends TileIOCore
         }
     }
 
+    int AEUpdateCooldown;
+
     @Override
     public void updateEntity() {
         if (!worldObj.isRemote) {
-            if (!tracking) {
-                if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
-                    if (remotePosition != null && remotePosition.getTileEntity() != this
-                            && hasTransferChip(TransferType.NETWORK_AE)) {
-                        if (remotePosition.getTileEntity() instanceof IGridHost) {
-                            aeGridNode = new LinkedGridNode(
-                                    ((IGridHost) remotePosition.getTileEntity()).getGridNode(ForgeDirection.UNKNOWN),
-                                    this);
-                            aeGridNode.updateState();
-                        }
-                    }
-
-                    for (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) {
-                        TileEntity tileEntity = worldObj.getTileEntity(
-                                xCoord + forgeDirection.offsetX,
-                                yCoord + forgeDirection.offsetY,
-                                zCoord + forgeDirection.offsetZ);
-                        if (tileEntity != null && tileEntity instanceof IGridHost) {
-                            IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
-                            if (gridNode != null) gridNode.updateState();
-                        }
-                    }
-                }
-
-                BlockTracker.INSTANCE.startTracking(remotePosition, this);
-                tracking = true;
+            if (AEUpdateCooldown-- <= 0 || justDestroyed) {
+                justDestroyed = false;
+                AEUpdateCooldown = 20;
+                updateAEConnection();
             }
-
             if (!trackingRedstone) {
                 RedstoneTracker.register(this);
                 trackingRedstone = true;
@@ -279,14 +249,7 @@ public class TileRemoteInterface extends TileIOCore
     @Override
     public void onChunkUnload() {
         IC2Helper.unloadEnergyTile(this);
-
-        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
-            if (aeGridNode != null) {
-                aeGridNode.destroy();
-                aeGridNode.updateState();
-            }
-        }
-
+        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) disconnectAE();
         RedstoneTracker.unregister(this);
         BlockTracker.INSTANCE.stopTracking(remotePosition);
     }
@@ -294,14 +257,7 @@ public class TileRemoteInterface extends TileIOCore
     @Override
     public void invalidate() {
         IC2Helper.unloadEnergyTile(this);
-
-        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
-            if (aeGridNode != null) {
-                aeGridNode.destroy();
-                aeGridNode.updateState();
-            }
-        }
-
+        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) disconnectAE();
         RedstoneTracker.unregister(this);
         BlockTracker.INSTANCE.stopTracking(remotePosition);
         super.invalidate();
@@ -390,46 +346,17 @@ public class TileRemoteInterface extends TileIOCore
      */
     public void setRemotePosition(DimensionalCoords coords) {
         IC2Helper.unloadEnergyTile(this);
-
-        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
-            if (aeGridNode != null) {
-                aeGridNode.destroy();
-                aeGridNode.updateState();
-            }
-        }
-
         RedstoneTracker.unregister(this);
         BlockTracker.INSTANCE.stopTracking(remotePosition);
         remotePosition = coords;
         RedstoneTracker.register(this);
         BlockTracker.INSTANCE.startTracking(remotePosition, this);
-
         IC2Helper.loadEnergyTile(this);
-
-        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
-            if (remotePosition != null && remotePosition.getTileEntity() != this
-                    && hasTransferChip(TransferType.NETWORK_AE)) {
-                if (remotePosition.getTileEntity() instanceof IGridHost) {
-                    aeGridNode = new LinkedGridNode(
-                            ((IGridHost) remotePosition.getTileEntity()).getGridNode(ForgeDirection.UNKNOWN),
-                            this);
-                    aeGridNode.updateState();
-                }
-            }
-
-            for (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) {
-                TileEntity tileEntity = worldObj.getTileEntity(
-                        xCoord + forgeDirection.offsetX,
-                        yCoord + forgeDirection.offsetY,
-                        zCoord + forgeDirection.offsetZ);
-                if (tileEntity != null && tileEntity instanceof IGridHost) {
-                    IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
-                    if (gridNode != null) gridNode.updateState();
-                }
-            }
-        }
-
         worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, this.getBlockType());
+        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
+            disconnectAE();
+            connectAE();
+        }
         markForUpdate();
     }
 
@@ -1036,100 +963,105 @@ public class TileRemoteInterface extends TileIOCore
         return null;
     }
 
-    /* IGRIDHOST */
-    @Override
     @Optional.Method(modid = DependencyInfo.ModIds.AE2)
     public IGridNode getGridNode(ForgeDirection dir) {
+
         IGridHost gridNode = (IGridHost) getTransferImplementation(IGridHost.class);
         return gridNode != null ? gridNode.getGridNode(getAdjustedSide(dir)) : null;
     }
 
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public AECableType getCableConnectionType(ForgeDirection dir) {
-        return AECableType.GLASS;
+    private boolean connected;
+
+    public void updateAEConnection() {
+        if (!Loader.isModLoaded(DependencyInfo.ModIds.AE2)) return;
+        if (hasTransferChip(TransferType.NETWORK_AE)) {
+            // if (!connected)
+            connectAE();
+        } else {
+            if (connected) disconnectAE();
+        }
     }
 
-    @Override
     @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public void securityBreak() {
-        worldObj.setBlockToAir(xCoord, yCoord, zCoord);
+    public void disconnectAE() {
+        connected = false;
+        for (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) {
+            TileEntity tileEntity = getWorldObj().getTileEntity(
+                    xCoord + forgeDirection.offsetX,
+                    yCoord + forgeDirection.offsetY,
+                    zCoord + forgeDirection.offsetZ);
+            if (tileEntity != null && tileEntity instanceof IGridHost) {
+                IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
+                if (gridNode != null) {
+                    ArrayList<IGridConnection> toDestroy = new ArrayList<>();
+                    for (IGridConnection connect : gridNode.getConnections()) {
+                        if (connect instanceof RIOGridConnection
+                                && connect.getDirection(gridNode) == forgeDirection.getOpposite()) {
+                            toDestroy.add(connect);
+                        }
+
+                    } ;
+                    toDestroy.forEach(connect -> connect.destroy());
+                }
+            }
+        }
     }
 
-    /* IGRIDBLOCK */
-    @Override
+    private EnumMap<ForgeDirection, RIOGridConnection> connections = new EnumMap<>(ForgeDirection.class);
+
     @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public double getIdlePowerUsage() {
-        IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        return gridBlock != null ? gridBlock.getIdlePowerUsage() : 0;
+    public void connectAE() {
+        connected = true;
+        connections.entrySet().removeIf(e -> e.getValue().isDestroyed());
+        for (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) {
+            if (connections.containsKey(forgeDirection)) {
+                continue;
+            }
+            TileEntity tileEntity = getWorldObj().getTileEntity(
+                    xCoord + forgeDirection.offsetX,
+                    yCoord + forgeDirection.offsetY,
+                    zCoord + forgeDirection.offsetZ);
+            if (tileEntity != null && tileEntity instanceof IGridHost) {
+                IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
+                if (gridNode != null) {
+                    try {
+                        if (getGridNode(forgeDirection) != null) connections.put(
+                                forgeDirection,
+                                new RIOGridConnection(
+                                        gridNode,
+                                        getGridNode(forgeDirection),
+                                        forgeDirection.getOpposite()));
+                    } catch (FailedConnection e) {
+                        // already connected or permission denied
+                    }
+
+                }
+            }
+        }
+
     }
 
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public EnumSet<GridFlags> getFlags() {
-        IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        return gridBlock != null ? gridBlock.getFlags() : EnumSet.noneOf(GridFlags.class);
-    }
+    private boolean justDestroyed;
 
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public boolean isWorldAccessible() {
-        return true;
-    }
+    public class RIOGridConnection extends GridConnection {
 
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public DimensionalCoord getLocation() {
-        return new DimensionalCoord(this);
-    }
+        public RIOGridConnection(IGridNode aNode, IGridNode bNode, ForgeDirection fromAtoB) throws FailedConnection {
+            super(aNode, bNode, fromAtoB);
 
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public AEColor getGridColor() {
-        IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        return gridBlock != null ? gridBlock.getGridColor() : AEColor.Transparent;
-    }
+        }
 
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public void onGridNotification(GridNotification notification) {
-        IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        if (gridBlock != null) gridBlock.onGridNotification(notification);
-    }
+        private boolean destroyed;
 
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public void setNetworkStatus(IGrid grid, int channelsInUse) {
-        IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        if (gridBlock != null) gridBlock.setNetworkStatus(grid, channelsInUse);
-    }
+        @Override
+        public void destroy() {
+            destroyed = true;
+            justDestroyed = true;
+            super.destroy();
+        }
 
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public EnumSet<ForgeDirection> getConnectableSides() {
-        IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        return gridBlock != null ? gridBlock.getConnectableSides() : EnumSet.noneOf(ForgeDirection.class);
+        public boolean isDestroyed() {
+            return destroyed;
+        }
     }
-
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public IGridHost getMachine() {
-        return this;
-    }
-
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public void gridChanged() {
-        IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        if (gridBlock != null) gridBlock.gridChanged();
-    }
-
-    @Override
-    @Optional.Method(modid = DependencyInfo.ModIds.AE2)
-    public ItemStack getMachineRepresentation() {
-        IGridBlock gridBlock = (IGridBlock) getTransferImplementation(IGridBlock.class);
-        return gridBlock != null ? gridBlock.getMachineRepresentation() : new ItemStack(this.blockType);
-    }
-
     /* END IMPLEMENTATIONS */
 }
