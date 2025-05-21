@@ -31,7 +31,7 @@ public class ChannelRegistry {
         channelDataMap = Maps.newHashMap();
         dirtyChannels = Sets.newHashSet();
 
-        MinecraftForge.EVENT_BUS.register(this);
+        //MinecraftForge.EVENT_BUS.register(this);
     }
 
     public DimensionalCoords getChannelData(int channel) {
