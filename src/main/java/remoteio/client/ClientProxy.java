@@ -22,7 +22,6 @@ import remoteio.client.render.RenderTileIntelligentWorkbench;
 import remoteio.client.render.RenderTileMachine;
 import remoteio.client.render.RenderTileRemoteInterface;
 import remoteio.client.render.RenderTileRemoteInventory;
-import remoteio.client.render.RenderTileTransceiver;
 import remoteio.common.CommonProxy;
 import remoteio.common.RemoteIO;
 import remoteio.common.core.helper.EventHelper;
@@ -32,7 +31,6 @@ import remoteio.common.tile.TileMachineHeater;
 import remoteio.common.tile.TileMachineReservoir;
 import remoteio.common.tile.TileRemoteInterface;
 import remoteio.common.tile.TileRemoteInventory;
-import remoteio.common.tile.TileTransceiver;
 
 /**
  * @author dmillerw
@@ -49,7 +47,6 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(TileMachineHeater.class, new RenderTileMachine());
         ClientRegistry
                 .bindTileEntitySpecialRenderer(TileIntelligentWorkbench.class, new RenderTileIntelligentWorkbench());
-        ClientRegistry.bindTileEntitySpecialRenderer(TileTransceiver.class, new RenderTileTransceiver());
 
         MinecraftForge.EVENT_BUS.register(SoundHandler.INSTANCE);
         EventHelper.register(new TooltipEventHandler());

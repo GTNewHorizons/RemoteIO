@@ -6,12 +6,10 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
 import remoteio.client.gui.GuiDocumentation;
 import remoteio.client.gui.GuiIntelligentWorkbench;
-import remoteio.client.gui.GuiItemSetChannel;
 import remoteio.client.gui.GuiRFConfig;
 import remoteio.client.gui.GuiRemoteInterface;
 import remoteio.client.gui.GuiRemoteInventory;
 import remoteio.client.gui.GuiSimpleCamo;
-import remoteio.client.gui.GuiTileSetChannel;
 import remoteio.common.inventory.InventoryItem;
 import remoteio.common.inventory.container.ContainerIntelligentWorkbench;
 import remoteio.common.inventory.container.ContainerNull;
@@ -20,7 +18,6 @@ import remoteio.common.inventory.container.ContainerRemoteInventory;
 import remoteio.common.inventory.container.ContainerSimpleCamo;
 import remoteio.common.tile.TileRemoteInterface;
 import remoteio.common.tile.TileRemoteInventory;
-import remoteio.common.tile.TileTransceiver;
 
 /**
  * @author dmillerw
@@ -32,7 +29,6 @@ public class GuiHandler implements IGuiHandler {
     public static final int GUI_REMOTE_INVENTORY = 2;
     public static final int GUI_INTELLIGENT_WORKBENCH = 3;
     public static final int GUI_SIMPLE_CAMO = 4;
-    public static final int GUI_SET_CHANNEL = 5;
     public static final int GUI_PDA = 6;
 
     @Override
@@ -56,9 +52,6 @@ public class GuiHandler implements IGuiHandler {
 
             case GUI_SIMPLE_CAMO:
                 return new ContainerSimpleCamo(player, new InventoryItem(player.getCurrentEquippedItem(), 1));
-
-            case GUI_SET_CHANNEL:
-                return new ContainerNull();
 
             case GUI_PDA:
                 return null;
@@ -84,11 +77,6 @@ public class GuiHandler implements IGuiHandler {
 
             case GUI_SIMPLE_CAMO:
                 return new GuiSimpleCamo(player, new InventoryItem(player.getCurrentEquippedItem(), 1));
-
-            case GUI_SET_CHANNEL: {
-                if (y > 0) return new GuiTileSetChannel((TileTransceiver) world.getTileEntity(x, y, z));
-                else return new GuiItemSetChannel(player.getHeldItem());
-            }
 
             case GUI_PDA:
                 return new GuiDocumentation();

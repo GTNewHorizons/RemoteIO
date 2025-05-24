@@ -8,7 +8,6 @@ import remoteio.common.network.packet.PacketClientAllowContainer;
 import remoteio.common.network.packet.PacketClientForceSlot;
 import remoteio.common.network.packet.PacketServerApplyRFConfig;
 import remoteio.common.network.packet.PacketServerOpenRemoteGUI;
-import remoteio.common.network.packet.PacketServerSetChannel;
 
 /**
  * @author dmillerw
@@ -22,6 +21,5 @@ public class PacketHandler {
         INSTANCE.registerMessage(PacketClientForceSlot.class, PacketClientForceSlot.class, 1, Side.CLIENT);
         INSTANCE.registerMessage(PacketServerOpenRemoteGUI.class, PacketServerOpenRemoteGUI.class, 2, Side.SERVER);
         INSTANCE.registerMessage(PacketServerApplyRFConfig.class, PacketServerApplyRFConfig.class, 3, Side.SERVER);
-        INSTANCE.registerMessage(PacketServerSetChannel.class, PacketServerSetChannel.class, 4, Side.SERVER);
     }
 }

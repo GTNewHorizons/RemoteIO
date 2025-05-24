@@ -19,7 +19,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import remoteio.common.block.BlockRemoteInterface;
-import remoteio.common.core.ChannelRegistry;
 import remoteio.common.core.handler.BlockUpdateTicker;
 import remoteio.common.core.handler.ContainerHandler;
 import remoteio.common.core.handler.GuiHandler;
@@ -45,8 +44,6 @@ public class RemoteIO {
     @SidedProxy(serverSide = ModInfo.SERVER, clientSide = ModInfo.CLIENT)
     public static CommonProxy proxy;
 
-    public static ChannelRegistry channelRegistry;
-
     public static LocalizationUpdater localizationUpdater;
 
     public static int heatProvided = 100;
@@ -60,8 +57,6 @@ public class RemoteIO {
 
         ModMetadata modMetadata = event.getModMetadata();
         modMetadata.version = ModInfo.VERSION;
-
-        channelRegistry = new ChannelRegistry();
 
         ModBlocks.initialize();
         ModItems.initialize();
