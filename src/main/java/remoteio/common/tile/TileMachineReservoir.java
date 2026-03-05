@@ -47,14 +47,20 @@ public class TileMachineReservoir extends TileCore implements IFluidHandler {
     private void update() {
         int found = 0;
         for (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) {
-            Block block = worldObj.getBlock(
-                    xCoord + forgeDirection.offsetX,
-                    yCoord + forgeDirection.offsetY,
-                    zCoord + forgeDirection.offsetZ);
-            if (block != null && (block == Blocks.water || block == Blocks.flowing_water)) found++;
+            final int x = xCoord + forgeDirection.offsetX;
+            final int y = yCoord + forgeDirection.offsetY;
+            final int z = zCoord + forgeDirection.offsetZ;
+            if (worldObj.blockExists(x, y, z)) {
+                Block block = worldObj.getBlock(x, y, z);
+                if (block != null && (block == Blocks.water || block == Blocks.flowing_water)) {
+                    found++;
+                }
+            }
         }
         boolean newFilled = found >= 2;
-        if (filled != newFilled) worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        if (filled != newFilled) {
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
         filled = newFilled;
     }
 
