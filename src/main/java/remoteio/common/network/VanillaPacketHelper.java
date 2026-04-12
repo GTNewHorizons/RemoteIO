@@ -80,25 +80,20 @@ public class VanillaPacketHelper {
 
     /* SENDING */
     public static void sendToAllWatchingTile(TileEntity tile, Packet packet) {
-        if (!tile.hasWorldObj()) {
-            return;
+        if (tile.hasWorldObj() && !tile.getWorldObj().isRemote) {
+            sendToAllWatchingChunk(tile.getWorldObj().getChunkFromBlockCoords(tile.xCoord, tile.zCoord), packet);
         }
-
-        sendToAllWatchingChunk(tile.getWorldObj().getChunkFromBlockCoords(tile.xCoord, tile.zCoord), packet);
     }
 
     /**
      * Sends the specified packet to all players either in specified chunk, or at least have that chunk loaded
      */
     public static void sendToAllWatchingChunk(Chunk chunk, Packet packet) {
-        ServerConfigurationManager manager = MinecraftServer.getServer().getConfigurationManager();
-        World world = chunk.worldObj;
-
+        final World world = chunk.worldObj;
         if (world instanceof WorldServer) {
-            PlayerManager playerManager = ((WorldServer) world).getPlayerManager();
-            for (Object obj : manager.playerEntityList) {
-                EntityPlayerMP player = (EntityPlayerMP) obj;
-
+            final PlayerManager playerManager = ((WorldServer) world).getPlayerManager();
+            final ServerConfigurationManager manager = MinecraftServer.getServer().getConfigurationManager();
+            for (EntityPlayerMP player : manager.playerEntityList) {
                 if (playerManager.isPlayerWatchingChunk(player, chunk.xPosition, chunk.zPosition)) {
                     // if (!player.loadedChunks.contains(new ChunkCoordIntPair(chunk.xPosition, chunk.zPosition))) {
                     player.playerNetServerHandler.sendPacket(packet);

@@ -63,7 +63,9 @@ public abstract class TileCore extends TileEntity {
     }
 
     public void sendClientUpdate(NBTTagCompound tag) {
-        VanillaPacketHelper.sendToAllWatchingTile(this, new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag));
+        if (this.hasWorldObj() && !this.worldObj.isRemote) {
+            VanillaPacketHelper.sendToAllWatchingTile(this, new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, tag));
+        }
     }
 
     @Override
