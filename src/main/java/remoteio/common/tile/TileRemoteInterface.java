@@ -449,12 +449,11 @@ public class TileRemoteInterface extends TileIOCore
     private Object resolveRemoteImpl(Class<?> cls) {
         if (remotePosition == null) return null;
 
-        final boolean canCache = hasWorldObj();
-        final long currentTick = canCache ? worldObj.getTotalWorldTime() : Long.MIN_VALUE;
+        final World hostWorld = worldObj;
+        final boolean canCache = hostWorld != null;
+        final long currentTick = canCache ? hostWorld.getTotalWorldTime() : Long.MIN_VALUE;
 
-        if (!canCache) {
-            invalidateRemoteCache();
-        } else if (remoteImplCacheValid && remoteImplCacheTick != currentTick) {
+        if (!canCache || (remoteImplCacheValid && remoteImplCacheTick != currentTick)) {
             invalidateRemoteCache();
         }
 
