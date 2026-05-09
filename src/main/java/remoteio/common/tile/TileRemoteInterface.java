@@ -87,8 +87,9 @@ public class TileRemoteInterface extends TileIOCore
 
     @Override
     public void callback(IBlockAccess world, int x, int y, int z) {
-        // The remote block changed – any cached implementations are stale.
+        // The remote block changed – any cached implementations and the missing-upgrade state are stale.
         invalidateRemoteCache();
+        missingUpgrade = false;
         updateVisualState();
         updateNeighbors();
     }
@@ -179,7 +180,9 @@ public class TileRemoteInterface extends TileIOCore
         if (nbt.hasKey("position")) {
             remotePosition = DimensionalCoords.fromNBT(nbt.getCompoundTag("position"));
             invalidateRemoteCache();
-            pendingAEConnect = true;
+            if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
+                pendingAEConnect = true;
+            }
         }
 
         rotationY = nbt.getInteger("axisY");
@@ -375,6 +378,7 @@ public class TileRemoteInterface extends TileIOCore
         BlockTracker.INSTANCE.stopTracking(remotePosition);
         remotePosition = coords;
         invalidateRemoteCache();
+        missingUpgrade = false;
         RedstoneTracker.register(this);
         BlockTracker.INSTANCE.startTracking(remotePosition, this);
         IC2Helper.loadEnergyTile(this);
@@ -393,13 +397,12 @@ public class TileRemoteInterface extends TileIOCore
     // -------------------------------------------------------------------------
 
     /**
-     * Invalidates the cached remote-implementation map and resets the {@link #missingUpgrade} flag. Must be called
-     * whenever the remote position or the remote block itself changes.
+     * Invalidates the cached remote-implementation map. Must be called whenever the remote position or the remote
+     * block itself changes.
      */
     private void invalidateRemoteCache() {
         remoteImplCacheValid = false;
         remoteImplCache.clear();
-        missingUpgrade = false;
     }
 
     /**
