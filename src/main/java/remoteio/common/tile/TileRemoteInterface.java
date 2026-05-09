@@ -195,8 +195,10 @@ public class TileRemoteInterface extends TileIOCore
 
         if (nbt.hasKey("position")) {
             remotePosition = DimensionalCoords.fromNBT(nbt.getCompoundTag("position"));
+            invalidateRemoteCache();
         } else if (nbt.hasKey("position_null")) {
             remotePosition = null;
+            invalidateRemoteCache();
         }
 
         if (nbt.hasKey("axisY")) {
@@ -445,6 +447,12 @@ public class TileRemoteInterface extends TileIOCore
         } else {
             // Fall back to the Block itself (e.g. a block that directly implements IEnergyHandler).
             impl = cls.isInstance(block) ? block : null;
+
+            // If this block should have a tile entity but it is temporarily unavailable (chunk not fully loaded yet,
+            // delayed TE creation, etc.), avoid caching a negative result so a later lookup can succeed.
+            if (impl == null && block.hasTileEntity(remoteWorld.getBlockMetadata(rx, ry, rz))) {
+                return null;
+            }
         }
 
         remoteImplCache.put(cls, impl != null ? impl : NO_IMPL);
