@@ -397,8 +397,8 @@ public class TileRemoteInterface extends TileIOCore
     // -------------------------------------------------------------------------
 
     /**
-     * Invalidates the cached remote-implementation map. Must be called whenever the remote position or the remote
-     * block itself changes.
+     * Invalidates the cached remote-implementation map. Must be called whenever the remote position or the remote block
+     * itself changes.
      */
     private void invalidateRemoteCache() {
         remoteImplCacheValid = false;
@@ -409,10 +409,12 @@ public class TileRemoteInterface extends TileIOCore
      * Returns the object at {@link #remotePosition} that implements {@code cls}, or {@code null} if the remote is
      * absent, the block does not exist, or neither its tile entity nor the block itself implements the interface.
      *
-     * <p>Results are cached per class until the remote block state changes (see {@link #invalidateRemoteCache()}).
-     * This avoids repeated world lookups (≥ 3 per call in the old code) for the same interface during a single tick.
+     * <p>
+     * Results are cached per class until the remote block state changes (see {@link #invalidateRemoteCache()}). This
+     * avoids repeated world lookups (≥ 3 per call in the old code) for the same interface during a single tick.
      *
-     * <p>Also fixes a pre-existing bug where, when the remote has no tile entity, the lookup would always return
+     * <p>
+     * Also fixes a pre-existing bug where, when the remote has no tile entity, the lookup would always return
      * {@code null} even if the {@link Block} itself implemented the interface.
      */
     private Object resolveRemoteImpl(Class<?> cls) {
