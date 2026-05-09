@@ -1,8 +1,9 @@
 package remoteio.common.tile;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -19,7 +20,6 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import appeng.api.exceptions.FailedConnection;
-import appeng.api.networking.IGridConnection;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.me.GridConnection;
@@ -87,6 +87,9 @@ public class TileRemoteInterface extends TileIOCore
 
     @Override
     public void callback(IBlockAccess world, int x, int y, int z) {
+        // The remote block changed – any cached implementations and the missing-upgrade state are stale.
+        invalidateRemoteCache();
+        missingUpgrade = false;
         updateVisualState();
         updateNeighbors();
     }
@@ -116,6 +119,9 @@ public class TileRemoteInterface extends TileIOCore
 
         RedstoneTracker.register(this);
 
+        // Update AE connection when chips are added or removed.
+        if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) updateAEConnection();
+
         // Clear missing upgrade flag
         missingUpgrade = false;
 
@@ -135,7 +141,27 @@ public class TileRemoteInterface extends TileIOCore
     private boolean registeredWithIC2 = false;
     private boolean trackingRedstone = false;
     private boolean missingUpgrade = false;
-    private boolean tracking = false;
+
+    /**
+     * Sentinel value placed in {@link #remoteImplCache} to indicate the remote does not implement an interface,
+     * distinguishing a cached negative from an absent cache entry.
+     */
+    private static final Object NO_IMPL = new Object();
+
+    /**
+     * Cache of resolved remote implementations keyed by the interface class. Populated lazily on first lookup and
+     * invalidated whenever the remote block state changes.
+     */
+    private final HashMap<Class<?>, Object> remoteImplCache = new HashMap<>();
+
+    /** Whether {@link #remoteImplCache} holds valid data for the current remote block state. */
+    private boolean remoteImplCacheValid = false;
+
+    /**
+     * Set to {@code true} after chunk-load so {@link #updateEntity} performs the initial AE connection on the first
+     * tick when the world is available, without needing a periodic poll.
+     */
+    private boolean pendingAEConnect = false;
 
     @Override
     public void writeCustomNBT(NBTTagCompound nbt) {
@@ -153,8 +179,10 @@ public class TileRemoteInterface extends TileIOCore
     public void readCustomNBT(NBTTagCompound nbt) {
         if (nbt.hasKey("position")) {
             remotePosition = DimensionalCoords.fromNBT(nbt.getCompoundTag("position"));
-        } else {
-            tracking = true;
+            invalidateRemoteCache();
+            if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
+                pendingAEConnect = true;
+            }
         }
 
         rotationY = nbt.getInteger("axisY");
@@ -176,14 +204,14 @@ public class TileRemoteInterface extends TileIOCore
         }
     }
 
-    int AEUpdateCooldown;
-
     @Override
     public void updateEntity() {
         if (!worldObj.isRemote) {
-            if (AEUpdateCooldown-- <= 0 || justDestroyed) {
+            // Perform deferred AE connection: on first tick after chunk-load, or immediately after a
+            // connection was auto-destroyed by the AE2 network (e.g. neighbouring cable removed).
+            if (pendingAEConnect || justDestroyed) {
+                pendingAEConnect = false;
                 justDestroyed = false;
-                AEUpdateCooldown = 20;
                 updateAEConnection();
             }
             if (!trackingRedstone) {
@@ -349,6 +377,8 @@ public class TileRemoteInterface extends TileIOCore
         RedstoneTracker.unregister(this);
         BlockTracker.INSTANCE.stopTracking(remotePosition);
         remotePosition = coords;
+        invalidateRemoteCache();
+        missingUpgrade = false;
         RedstoneTracker.register(this);
         BlockTracker.INSTANCE.startTracking(remotePosition, this);
         IC2Helper.loadEnergyTile(this);
@@ -362,38 +392,77 @@ public class TileRemoteInterface extends TileIOCore
 
     /* END CLIENT UPDATE METHODS */
 
+    // -------------------------------------------------------------------------
+    // Remote implementation resolution and caching
+    // -------------------------------------------------------------------------
+
+    /**
+     * Invalidates the cached remote-implementation map. Must be called whenever the remote position or the remote
+     * block itself changes.
+     */
+    private void invalidateRemoteCache() {
+        remoteImplCacheValid = false;
+        remoteImplCache.clear();
+    }
+
+    /**
+     * Returns the object at {@link #remotePosition} that implements {@code cls}, or {@code null} if the remote is
+     * absent, the block does not exist, or neither its tile entity nor the block itself implements the interface.
+     *
+     * <p>Results are cached per class until the remote block state changes (see {@link #invalidateRemoteCache()}).
+     * This avoids repeated world lookups (≥ 3 per call in the old code) for the same interface during a single tick.
+     *
+     * <p>Also fixes a pre-existing bug where, when the remote has no tile entity, the lookup would always return
+     * {@code null} even if the {@link Block} itself implemented the interface.
+     */
+    private Object resolveRemoteImpl(Class<?> cls) {
+        if (remotePosition == null) return null;
+
+        if (remoteImplCacheValid && remoteImplCache.containsKey(cls)) {
+            Object cached = remoteImplCache.get(cls);
+            return cached == NO_IMPL ? null : cached;
+        }
+
+        // Perform a single-pass world lookup: one getWorld(), one getBlock(), one getTileEntity().
+        World remoteWorld = remotePosition.getWorld();
+        if (remoteWorld == null) return null;
+
+        int rx = remotePosition.x, ry = remotePosition.y, rz = remotePosition.z;
+        Block block = remoteWorld.getBlock(rx, ry, rz);
+        if (block == null || block.isAir(remoteWorld, rx, ry, rz)) {
+            // Block is absent; cache the negative so we don't keep looking up an empty position.
+            remoteImplCache.put(cls, NO_IMPL);
+            remoteImplCacheValid = true;
+            return null;
+        }
+
+        TileEntity remote = remoteWorld.getTileEntity(rx, ry, rz);
+        Object impl;
+        if (remote != null) {
+            impl = cls.isInstance(remote) ? remote : null;
+        } else {
+            // Fall back to the Block itself (e.g. a block that directly implements IEnergyHandler).
+            impl = cls.isInstance(block) ? block : null;
+        }
+
+        remoteImplCache.put(cls, impl != null ? impl : NO_IMPL);
+        remoteImplCacheValid = true;
+        return impl;
+    }
+
     public Object getUpgradeImplementation(Class<?> cls) {
         return getUpgradeImplementation(cls, -1);
     }
 
     public Object getUpgradeImplementation(Class<?> cls, int upgradeType) {
-        if (remotePosition == null) {
+        Object impl = resolveRemoteImpl(cls);
+        if (impl == null) return null;
+
+        if (upgradeType != -1 && !hasUpgradeChip(upgradeType)) {
             return null;
         }
 
-        if (!remotePosition.blockExists()) {
-            return null;
-        }
-
-        TileEntity remote = remotePosition.getTileEntity();
-
-        if (remote != null) {
-            if (!(cls.isInstance(remote))) {
-                return null;
-            }
-        } else {
-            if (!(cls.isInstance(remotePosition.getBlock()))) {
-                return null;
-            }
-        }
-
-        if (upgradeType != -1) {
-            if (!hasUpgradeChip(upgradeType)) {
-                return null;
-            }
-        }
-
-        return cls.cast(remote);
+        return impl;
     }
 
     public Object getTransferImplementation(Class<?> cls) {
@@ -401,37 +470,18 @@ public class TileRemoteInterface extends TileIOCore
     }
 
     public Object getTransferImplementation(Class<?> cls, boolean requiresChip) {
-        if (remotePosition == null) {
+        Object impl = resolveRemoteImpl(cls);
+        if (impl == null) return null;
+
+        if (requiresChip && !hasTransferChip(TransferType.getTypeForInterface(cls))) {
+            if (!missingUpgrade) {
+                missingUpgrade = true;
+                updateVisualState();
+            }
             return null;
         }
 
-        if (!remotePosition.blockExists()) {
-            return null;
-        }
-
-        TileEntity remote = remotePosition.getTileEntity();
-
-        if (remote != null) {
-            if (!(cls.isInstance(remote))) {
-                return null;
-            }
-        } else {
-            if (!(cls.isInstance(remotePosition.getBlock()))) {
-                return null;
-            }
-        }
-
-        if (requiresChip) {
-            if (!hasTransferChip(TransferType.getTypeForInterface(cls))) {
-                if (missingUpgrade == false) {
-                    missingUpgrade = true;
-                    updateVisualState();
-                }
-                return null;
-            }
-        }
-
-        return cls.cast(remote);
+        return impl;
     }
 
     public ForgeDirection getAdjustedSide(ForgeDirection side) {
@@ -985,26 +1035,13 @@ public class TileRemoteInterface extends TileIOCore
     @Optional.Method(modid = DependencyInfo.ModIds.AE2)
     public void disconnectAE() {
         connected = false;
-        for (ForgeDirection forgeDirection : ForgeDirection.VALID_DIRECTIONS) {
-            TileEntity tileEntity = getWorldObj().getTileEntity(
-                    xCoord + forgeDirection.offsetX,
-                    yCoord + forgeDirection.offsetY,
-                    zCoord + forgeDirection.offsetZ);
-            if (tileEntity != null && tileEntity instanceof IGridHost) {
-                IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
-                if (gridNode != null) {
-                    ArrayList<IGridConnection> toDestroy = new ArrayList<>();
-                    for (IGridConnection connect : gridNode.getConnections()) {
-                        if (connect instanceof RIOGridConnection
-                                && connect.getDirection(gridNode) == forgeDirection.getOpposite()) {
-                            toDestroy.add(connect);
-                        }
-
-                    } ;
-                    toDestroy.forEach(connect -> connect.destroy());
-                }
+        // Destroy all tracked connections directly instead of scanning neighbours.
+        for (RIOGridConnection connection : connections.values()) {
+            if (!connection.isDestroyed()) {
+                connection.destroy();
             }
         }
+        connections.clear();
     }
 
     private EnumMap<ForgeDirection, RIOGridConnection> connections = new EnumMap<>(ForgeDirection.class);
@@ -1022,23 +1059,21 @@ public class TileRemoteInterface extends TileIOCore
                     yCoord + forgeDirection.offsetY,
                     zCoord + forgeDirection.offsetZ);
             if (tileEntity != null && tileEntity instanceof IGridHost) {
-                IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
-                if (gridNode != null) {
-                    try {
-                        if (getGridNode(forgeDirection) != null) connections.put(
-                                forgeDirection,
-                                new RIOGridConnection(
-                                        gridNode,
-                                        getGridNode(forgeDirection),
-                                        forgeDirection.getOpposite()));
-                    } catch (FailedConnection e) {
-                        // already connected or permission denied
+                IGridNode neighbourNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
+                if (neighbourNode != null) {
+                    IGridNode myNode = getGridNode(forgeDirection);
+                    if (myNode != null) {
+                        try {
+                            connections.put(
+                                    forgeDirection,
+                                    new RIOGridConnection(neighbourNode, myNode, forgeDirection.getOpposite()));
+                        } catch (FailedConnection e) {
+                            // already connected or permission denied
+                        }
                     }
-
                 }
             }
         }
-
     }
 
     private boolean justDestroyed;
