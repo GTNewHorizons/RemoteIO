@@ -162,6 +162,7 @@ public class TileRemoteInterface extends TileIOCore
      * tick when the world is available, without needing a periodic poll.
      */
     private boolean pendingAEConnect = false;
+    private boolean pendingRemoteTracking = false;
 
     @Override
     public void writeCustomNBT(NBTTagCompound nbt) {
@@ -180,6 +181,14 @@ public class TileRemoteInterface extends TileIOCore
         if (nbt.hasKey("position")) {
             remotePosition = DimensionalCoords.fromNBT(nbt.getCompoundTag("position"));
             invalidateRemoteCache();
+            if (!hasWorldObj()) {
+                pendingRemoteTracking = true;
+            } else {
+                pendingRemoteTracking = false;
+                if (!worldObj.isRemote) {
+                    BlockTracker.INSTANCE.startTracking(remotePosition, this);
+                }
+            }
             if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
                 pendingAEConnect = true;
             }
@@ -209,6 +218,10 @@ public class TileRemoteInterface extends TileIOCore
     @Override
     public void updateEntity() {
         if (!worldObj.isRemote) {
+            if (pendingRemoteTracking && remotePosition != null) {
+                BlockTracker.INSTANCE.startTracking(remotePosition, this);
+                pendingRemoteTracking = false;
+            }
             // Perform deferred AE connection: on first tick after chunk-load, or immediately after a
             // connection was auto-destroyed by the AE2 network (e.g. neighbouring cable removed).
             if (pendingAEConnect || justDestroyed) {
@@ -281,6 +294,7 @@ public class TileRemoteInterface extends TileIOCore
         IC2Helper.unloadEnergyTile(this);
         if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) disconnectAE();
         RedstoneTracker.unregister(this);
+        pendingRemoteTracking = false;
         BlockTracker.INSTANCE.stopTracking(remotePosition);
     }
 
@@ -289,8 +303,16 @@ public class TileRemoteInterface extends TileIOCore
         IC2Helper.unloadEnergyTile(this);
         if (Loader.isModLoaded(DependencyInfo.ModIds.AE2)) disconnectAE();
         RedstoneTracker.unregister(this);
+        pendingRemoteTracking = false;
         BlockTracker.INSTANCE.stopTracking(remotePosition);
         super.invalidate();
+    }
+
+    @Override
+    public void onNeighborUpdated() {
+        if (!worldObj.isRemote && Loader.isModLoaded(DependencyInfo.ModIds.AE2)) {
+            updateAEConnection();
+        }
     }
 
     @Override
@@ -379,6 +401,7 @@ public class TileRemoteInterface extends TileIOCore
         RedstoneTracker.unregister(this);
         BlockTracker.INSTANCE.stopTracking(remotePosition);
         remotePosition = coords;
+        pendingRemoteTracking = false;
         invalidateRemoteCache();
         missingUpgrade = false;
         RedstoneTracker.register(this);
