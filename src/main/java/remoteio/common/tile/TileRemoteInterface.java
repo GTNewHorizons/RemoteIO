@@ -165,6 +165,16 @@ public class TileRemoteInterface extends TileIOCore
      */
     private boolean pendingAEConnect = false;
     private boolean pendingRemoteTracking = false;
+    /**
+     * Fallback reconnect timer. Counts down every server tick while the AE chip is installed. When it reaches zero (or
+     * goes negative from the initial default of 0), {@link #connectAE()} is called unconditionally (it is idempotent –
+     * it skips directions that already have live connections) and the timer is reset to {@link #AE_RECONNECT_INTERVAL}.
+     * This handles races where {@link #onNeighborUpdated()} fires before a newly-placed cable's grid node is ready,
+     * leaving the connection unestablished with no subsequent event to trigger a retry. Intentionally starts at
+     * {@code 0} so that the first server tick always attempts a connection for newly-placed tiles.
+     */
+    private int aeReconnectTimer = 0;
+    private static final int AE_RECONNECT_INTERVAL = 40;
 
     @Override
     public void writeCustomNBT(NBTTagCompound nbt) {
@@ -229,7 +239,16 @@ public class TileRemoteInterface extends TileIOCore
             if (pendingAEConnect || justDestroyed) {
                 pendingAEConnect = false;
                 justDestroyed = false;
+                aeReconnectTimer = AE_RECONNECT_INTERVAL;
                 updateAEConnection();
+            }
+            // Fallback periodic reconnect: handles the race where onNeighborUpdated() fires while the
+            // neighbouring cable's grid node is not yet ready, so the first connection attempt silently
+            // fails. connectAE() is idempotent – it skips directions that already have live connections.
+            if (Loader.isModLoaded(DependencyInfo.ModIds.AE2) && hasTransferChip(TransferType.NETWORK_AE)
+                    && --aeReconnectTimer <= 0) {
+                aeReconnectTimer = AE_RECONNECT_INTERVAL;
+                connectAE();
             }
             if (!trackingRedstone) {
                 RedstoneTracker.register(this);

@@ -62,6 +62,15 @@ public class RenderTileRemoteInterface extends TileEntitySpecialRenderer {
             if (!tile.visualState.isCamouflage()) {
                 IIcon icon = BlockIOCore.overlays[tile.visualState.ordinal()];
 
+                // Some rendering pipelines (e.g. Angelica / Embeddium CeleritasWorldRenderer) leave the
+                // tessellator in a drawing session when they call TESRs. We must flush that batch BEFORE
+                // modifying the GL matrix so that the queued vertices are still drawn with the correct
+                // (caller's) transform. After we finish, we restart the batch so the caller can continue.
+                boolean tessellatorInterrupted = IORenderHelper.isTessellatorDrawing();
+                if (tessellatorInterrupted) {
+                    net.minecraft.client.renderer.Tessellator.instance.draw();
+                }
+
                 GL11.glPushMatrix();
                 GL11.glDisable(GL11.GL_LIGHTING);
                 GL11.glTranslated(x, y, z);
@@ -78,6 +87,13 @@ public class RenderTileRemoteInterface extends TileEntitySpecialRenderer {
 
                 GL11.glEnable(GL11.GL_LIGHTING);
                 GL11.glPopMatrix();
+
+                if (tessellatorInterrupted) {
+                    // Restart in GL_QUADS mode: block-entity batch renderers in the GTNH rendering stack
+                    // (Angelica/CeleritasWorldRenderer) use GL_QUADS for their TE batches, so restarting
+                    // with startDrawingQuads() restores the mode the caller expects.
+                    net.minecraft.client.renderer.Tessellator.instance.startDrawingQuads();
+                }
             }
         }
     }
