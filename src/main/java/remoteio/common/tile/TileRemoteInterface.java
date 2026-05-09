@@ -442,6 +442,7 @@ public class TileRemoteInterface extends TileIOCore
 
         TileEntity remote = remoteWorld.getTileEntity(rx, ry, rz);
         Object impl;
+        boolean cacheNegative = true;
         if (remote != null) {
             impl = cls.isInstance(remote) ? remote : null;
         } else {
@@ -451,12 +452,17 @@ public class TileRemoteInterface extends TileIOCore
             // If this block should have a tile entity but it is temporarily unavailable (chunk not fully loaded yet,
             // delayed TE creation, etc.), avoid caching a negative result so a later lookup can succeed.
             if (impl == null && block.hasTileEntity(remoteWorld.getBlockMetadata(rx, ry, rz))) {
-                return null;
+                cacheNegative = false;
             }
         }
 
-        remoteImplCache.put(cls, impl != null ? impl : NO_IMPL);
-        remoteImplCacheValid = true;
+        if (impl != null) {
+            remoteImplCache.put(cls, impl);
+            remoteImplCacheValid = true;
+        } else if (cacheNegative) {
+            remoteImplCache.put(cls, NO_IMPL);
+            remoteImplCacheValid = true;
+        }
         return impl;
     }
 
