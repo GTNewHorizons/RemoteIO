@@ -156,6 +156,8 @@ public class TileRemoteInterface extends TileIOCore
 
     /** Whether {@link #remoteImplCache} holds valid data for the current remote block state. */
     private boolean remoteImplCacheValid = false;
+    /** The world tick for which {@link #remoteImplCache} is valid. */
+    private long remoteImplCacheTick = Long.MIN_VALUE;
 
     /**
      * Set to {@code true} after chunk-load so {@link #updateEntity} performs the initial AE connection on the first
@@ -427,6 +429,7 @@ public class TileRemoteInterface extends TileIOCore
      */
     private void invalidateRemoteCache() {
         remoteImplCacheValid = false;
+        remoteImplCacheTick = Long.MIN_VALUE;
         remoteImplCache.clear();
     }
 
@@ -435,8 +438,9 @@ public class TileRemoteInterface extends TileIOCore
      * absent, the block does not exist, or neither its tile entity nor the block itself implements the interface.
      *
      * <p>
-     * Results are cached per class until the remote block state changes (see {@link #invalidateRemoteCache()}). This
-     * avoids repeated world lookups (≥ 3 per call in the old code) for the same interface during a single tick.
+     * Results are cached per class for the current tick and invalidated when the remote changes (see
+     * {@link #invalidateRemoteCache()}). This avoids repeated world lookups for repeated same-tick interface queries
+     * while preventing stale tile-entity references from persisting across ticks.
      *
      * <p>
      * Also fixes a pre-existing bug where, when the remote has no tile entity, the lookup would always return
@@ -444,6 +448,15 @@ public class TileRemoteInterface extends TileIOCore
      */
     private Object resolveRemoteImpl(Class<?> cls) {
         if (remotePosition == null) return null;
+
+        final boolean canCache = hasWorldObj();
+        final long currentTick = canCache ? worldObj.getTotalWorldTime() : Long.MIN_VALUE;
+
+        if (!canCache) {
+            invalidateRemoteCache();
+        } else if (remoteImplCacheValid && remoteImplCacheTick != currentTick) {
+            invalidateRemoteCache();
+        }
 
         if (remoteImplCacheValid && remoteImplCache.containsKey(cls)) {
             Object cached = remoteImplCache.get(cls);
@@ -458,8 +471,11 @@ public class TileRemoteInterface extends TileIOCore
         Block block = remoteWorld.getBlock(rx, ry, rz);
         if (block == null || block.isAir(remoteWorld, rx, ry, rz)) {
             // Block is absent; cache the negative so we don't keep looking up an empty position.
-            remoteImplCache.put(cls, NO_IMPL);
-            remoteImplCacheValid = true;
+            if (canCache) {
+                remoteImplCache.put(cls, NO_IMPL);
+                remoteImplCacheValid = true;
+                remoteImplCacheTick = currentTick;
+            }
             return null;
         }
 
@@ -480,11 +496,17 @@ public class TileRemoteInterface extends TileIOCore
         }
 
         if (impl != null) {
-            remoteImplCache.put(cls, impl);
-            remoteImplCacheValid = true;
+            if (canCache) {
+                remoteImplCache.put(cls, impl);
+                remoteImplCacheValid = true;
+                remoteImplCacheTick = currentTick;
+            }
         } else if (cacheNegative) {
-            remoteImplCache.put(cls, NO_IMPL);
-            remoteImplCacheValid = true;
+            if (canCache) {
+                remoteImplCache.put(cls, NO_IMPL);
+                remoteImplCacheValid = true;
+                remoteImplCacheTick = currentTick;
+            }
         }
         return impl;
     }
