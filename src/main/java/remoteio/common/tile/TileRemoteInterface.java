@@ -1024,17 +1024,17 @@ public class TileRemoteInterface extends TileIOCore
             if (tileEntity != null && tileEntity instanceof IGridHost) {
                 IGridNode gridNode = ((IGridHost) tileEntity).getGridNode(forgeDirection.getOpposite());
                 if (gridNode != null) {
-                    try {
-                        if (getGridNode(forgeDirection) != null) connections.put(
-                                forgeDirection,
-                                new RIOGridConnection(
-                                        gridNode,
-                                        getGridNode(forgeDirection),
-                                        forgeDirection.getOpposite()));
-                    } catch (FailedConnection e) {
-                        // already connected or permission denied
+                    IGridNode ownNode = getGridNode(forgeDirection);
+                    // prevent self-connection
+                    if (ownNode != null && ownNode != gridNode) {
+                        try {
+                            connections.put(
+                                    forgeDirection,
+                                    new RIOGridConnection(gridNode, ownNode, forgeDirection.getOpposite()));
+                        } catch (FailedConnection e) {
+                            // already connected or permission denied
+                        }
                     }
-
                 }
             }
         }
