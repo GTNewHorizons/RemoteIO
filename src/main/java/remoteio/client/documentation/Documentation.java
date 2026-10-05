@@ -3,6 +3,8 @@ package remoteio.client.documentation;
 import java.util.EnumMap;
 import java.util.List;
 
+import net.minecraft.util.StatCollector;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -69,8 +71,14 @@ public class Documentation {
     }
 
     public static enum Category {
+
         BLOCK,
         ITEM,
-        OTHER
+        OTHER;
+
+        public String getDisplayName() {
+            // To be able to index from the entries in the lang file to here. `documentation.category.block.upper`
+            return StatCollector.translateToLocal("documentation.category." + this.name().toLowerCase() + ".upper");
+        }
     }
 }

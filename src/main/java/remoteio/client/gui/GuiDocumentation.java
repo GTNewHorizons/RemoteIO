@@ -121,24 +121,24 @@ public class GuiDocumentation extends GuiScreen {
             GL11.glEnable(GL11.GL_TEXTURE_2D);
 
             mc.fontRenderer.drawString(
-                    "BLOCK",
-                    centeredX("BLOCK"),
+                    StatCollector.translateToLocal("documentation.category.block.upper"),
+                    centeredX(StatCollector.translateToLocal("documentation.category.block.upper")),
                     guiTop - offset + SCREEN_Y + SCREEN_HEIGHT / 4,
                     selection == 0 ? TEXT_HIGHLIGHT_COLOR : TEXT_COLOR);
             mc.fontRenderer.drawString(
-                    "ITEM",
-                    centeredX("ITEM"),
+                    StatCollector.translateToLocal("documentation.category.item.upper"),
+                    centeredX(StatCollector.translateToLocal("documentation.category.item.upper")),
                     guiTop - offset + middle,
                     selection == 1 ? TEXT_HIGHLIGHT_COLOR : TEXT_COLOR);
             mc.fontRenderer.drawString(
-                    "OTHER",
-                    centeredX("OTHER"),
+                    StatCollector.translateToLocal("documentation.category.other.upper"),
+                    centeredX(StatCollector.translateToLocal("documentation.category.other.upper")),
                     guiTop - offset + middle + SCREEN_HEIGHT / 4,
                     selection == 2 ? TEXT_HIGHLIGHT_COLOR : TEXT_COLOR);
         } else if (currentEntry == null) {
             mc.fontRenderer.drawString(
-                    currentCategory.name() + ":",
-                    centeredX(currentCategory.name() + ":"),
+                    currentCategory.getDisplayName() + ":",
+                    centeredX(currentCategory.getDisplayName() + ":"),
                     guiTop + SCREEN_Y + 5,
                     TEXT_COLOR);
 
